@@ -128,7 +128,7 @@ class GatewayState:
     # ── log ───────────────────────────────────────────────────────────────────
     def append_log(self, key_id: str, endpoint: str, status: int, ms: float):
         self.request_log.append({"ts": time.time(), "key_id": key_id,
-                                  "endpoint": endpoint, "status": status, "ms": round(ms, 1)})
+                                  "endpoint": endpoint, "status": status, "latency_ms": round(ms, 1)})
         if len(self.request_log) > LOG_MAX:
             self.request_log = self.request_log[-LOG_MAX:]
 
@@ -146,8 +146,8 @@ class GatewayState:
             "exhausted_keys":          len(exhaust),
             "total_proxied":           self.total_proxied,
             "total_errors":            self.total_errors,
-            "total_remaining":         sum(max(0, k.requests_limit - k.requests_used) for k in self.keys),
-            "requests_per_minute":     rpm,
+            "total_remaining_requests": sum(max(0, k.requests_limit - k.requests_used) for k in self.keys),
+            "requests_last_minute":     rpm,
             "uptime_seconds":          int(now - self.started_at),
             "next_reset_at":           resets[0] if resets else None,
             "current_key_id":          active[0].id if active else None,
@@ -363,4 +363,5 @@ async def proxy(path: str, request: Request):
 # ─── Entry ────────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.getenv("PORT", 8000)), reload=True)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run("main:app", host="0.0.0.0", port=port)
