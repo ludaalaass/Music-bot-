@@ -1,0 +1,790 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ShrutiGateway — Admin</title>
+<style>
+/* ── Tokens ─────────────────────────────────────────────── */
+:root {
+  --bg:        #0d0f14;
+  --surface:   #13161e;
+  --surface2:  #1a1e2a;
+  --border:    #252a38;
+  --text:      #e2e6f0;
+  --muted:     #6b7599;
+  --accent:    #6c63ff;
+  --accent2:   #9b8ffd;
+  --green:     #34d399;
+  --yellow:    #fbbf24;
+  --red:       #f87171;
+  --sidebar-w: 230px;
+  --radius:    10px;
+  --font:      'Inter', system-ui, sans-serif;
+}
+[data-theme="light"] {
+  --bg:       #f0f2f8;
+  --surface:  #ffffff;
+  --surface2: #eef0f8;
+  --border:   #dde1ef;
+  --text:     #1a1e2a;
+  --muted:    #7b82a3;
+  --accent:   #4f46e5;
+  --accent2:  #7c74f0;
+}
+
+/* ── Reset ──────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: var(--font); background: var(--bg); color: var(--text); font-size: 14px; }
+button { cursor: pointer; font-family: inherit; font-size: inherit; border: none; outline: none; }
+input, textarea { font-family: inherit; font-size: inherit; }
+a { color: inherit; text-decoration: none; }
+
+/* ── Layout ─────────────────────────────────────────────── */
+.layout { display: flex; height: 100vh; overflow: hidden; }
+
+/* ── Sidebar ────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+.sidebar-logo {
+  padding: 20px 18px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo .logo-mark {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent2);
+  letter-spacing: -0.5px;
+}
+.sidebar-logo .logo-sub {
+  font-size: 10px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+.sidebar-nav {
+  padding: 10px 0;
+  flex: 1;
+}
+.nav-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  padding: 12px 18px 4px;
+}
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 18px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  transition: all 0.15s;
+}
+.nav-item:hover { background: var(--surface2); color: var(--text); }
+.nav-item.active {
+  background: var(--surface2);
+  color: var(--accent2);
+  border-left-color: var(--accent);
+}
+.nav-item svg { width: 16px; height: 16px; opacity: 0.8; flex-shrink: 0; }
+.sidebar-footer {
+  padding: 14px 18px;
+  border-top: 1px solid var(--border);
+}
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 500;
+  width: 100%;
+  justify-content: center;
+  transition: all 0.15s;
+}
+.theme-toggle:hover { color: var(--text); border-color: var(--accent); }
+
+/* ── Main ────────────────────────────────────────────────── */
+.main { flex: 1; overflow-y: auto; padding: 28px; display: flex; flex-direction: column; gap: 24px; }
+.page { display: none; flex-direction: column; gap: 20px; }
+.page.active { display: flex; }
+.page-title { font-size: 20px; font-weight: 700; color: var(--text); }
+.page-sub { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* ── Cards ───────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 14px;
+}
+
+/* ── Stat Grid ───────────────────────────────────────────── */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 14px; }
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.stat-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-value { font-size: 28px; font-weight: 700; margin-top: 6px; line-height: 1; }
+.stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+.stat-value.green { color: var(--green); }
+.stat-value.yellow { color: var(--yellow); }
+.stat-value.red { color: var(--red); }
+.stat-value.accent { color: var(--accent2); }
+
+/* ── Key Table ───────────────────────────────────────────── */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead tr th {
+  text-align: left;
+  padding: 8px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+tbody tr td {
+  padding: 11px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+tbody tr:last-child td { border-bottom: none; }
+tbody tr:hover td { background: var(--surface2); }
+
+/* ── Progress Bar ────────────────────────────────────────── */
+.prog-wrap { display: flex; align-items: center; gap: 8px; min-width: 120px; }
+.prog { flex: 1; height: 6px; background: var(--surface2); border-radius: 99px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 99px; transition: width 0.3s; }
+.prog-pct { font-size: 11px; color: var(--muted); min-width: 32px; text-align: right; }
+
+/* ── Badge ───────────────────────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 99px;
+}
+.badge.green { background: rgba(52,211,153,.15); color: var(--green); }
+.badge.red { background: rgba(248,113,113,.15); color: var(--red); }
+.badge.yellow { background: rgba(251,191,36,.15); color: var(--yellow); }
+.badge.accent { background: rgba(108,99,255,.15); color: var(--accent2); }
+
+/* ── Buttons ─────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 7px;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.15s;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent2); }
+.btn-ghost { background: var(--surface2); border: 1px solid var(--border); color: var(--text); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent2); }
+.btn-danger { background: rgba(248,113,113,.15); color: var(--red); border: 1px solid rgba(248,113,113,.2); }
+.btn-danger:hover { background: rgba(248,113,113,.25); }
+.btn-sm { padding: 4px 10px; font-size: 11px; }
+.btn-icon { padding: 5px 7px; }
+
+/* ── Form ────────────────────────────────────────────────── */
+.form-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.form-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 8px 12px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  min-width: 200px;
+}
+.form-input:focus { border-color: var(--accent); }
+.form-input::placeholder { color: var(--muted); }
+textarea.form-input { min-height: 80px; resize: vertical; }
+.form-hint { font-size: 11px; color: var(--muted); }
+
+/* ── Log Table ───────────────────────────────────────────── */
+.log-row { display: grid; grid-template-columns: 80px 70px 1fr 70px 80px; gap: 12px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 12px; }
+.log-row:last-child { border-bottom: none; }
+.log-header { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.log-ts { color: var(--muted); }
+.log-key { font-family: monospace; color: var(--accent2); }
+.log-endpoint { color: var(--text); font-family: monospace; font-size: 11px; }
+.log-status.ok { color: var(--green); }
+.log-status.err { color: var(--red); }
+.log-latency { color: var(--muted); text-align: right; }
+
+/* ── Status dot ──────────────────────────────────────────── */
+.dot { width: 7px; height: 7px; border-radius: 50%; display: inline-block; }
+.dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.dot.red { background: var(--red); }
+.dot.yellow { background: var(--yellow); }
+
+/* ── Toast ───────────────────────────────────────────────── */
+#toast-wrap { position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: column; gap: 8px; z-index: 9999; pointer-events: none; }
+.toast {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-size: 13px;
+  color: var(--text);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  animation: slideup 0.2s ease;
+  pointer-events: all;
+}
+.toast.ok { border-left: 3px solid var(--green); }
+.toast.err { border-left: 3px solid var(--red); }
+@keyframes slideup { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+
+/* ── Misc ────────────────────────────────────────────────── */
+.empty { color: var(--muted); text-align: center; padding: 40px; font-size: 13px; }
+.key-mono { font-family: monospace; font-size: 12px; color: var(--muted); max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.flex { display: flex; }
+.gap-2 { gap: 8px; }
+.gap-1 { gap: 4px; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.ml-auto { margin-left: auto; }
+.live-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); animation: pulse 1.5s ease infinite; display: inline-block; }
+@keyframes pulse { 0%,100% { opacity:1; transform: scale(1); } 50% { opacity:0.5; transform: scale(0.85); } }
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 640px) {
+  :root { --sidebar-w: 200px; }
+  .main { padding: 16px; }
+  .stat-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-mark">⚡ ShrutiGW</div>
+      <div class="logo-sub">API Key Gateway</div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-label">Overview</div>
+      <div class="nav-item active" onclick="goto('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+      <div class="nav-label">Management</div>
+      <div class="nav-item" onclick="goto('keys')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        API Keys
+      </div>
+      <div class="nav-item" onclick="goto('add')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        Add Keys
+      </div>
+      <div class="nav-label">Analytics</div>
+      <div class="nav-item" onclick="goto('logs')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+        Request Logs
+      </div>
+      <div class="nav-item" onclick="goto('integration')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        Integration
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <button class="theme-toggle" onclick="toggleTheme()">
+        <span id="theme-icon">☀️</span>
+        <span id="theme-label">Light Mode</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="main">
+
+    <!-- ── Dashboard ──────────────────────────────────────── -->
+    <div class="page active" id="page-dashboard">
+      <div>
+        <div class="flex items-center gap-2" style="gap:10px;">
+          <span class="live-dot"></span>
+          <div class="page-title">Dashboard</div>
+          <span class="badge accent ml-auto" style="margin-left:auto;">Live</span>
+        </div>
+        <div class="page-sub">Gateway health, key pool status, real-time throughput</div>
+      </div>
+
+      <div class="stat-grid" id="stat-grid">
+        <div class="stat-card"><div class="stat-label">Active Keys</div><div class="stat-value green" id="s-active">—</div><div class="stat-sub">ready to serve</div></div>
+        <div class="stat-card"><div class="stat-label">Exhausted</div><div class="stat-value yellow" id="s-exhausted">—</div><div class="stat-sub">pending reset</div></div>
+        <div class="stat-card"><div class="stat-label">Total Proxied</div><div class="stat-value accent" id="s-proxied">—</div><div class="stat-sub">all time</div></div>
+        <div class="stat-card"><div class="stat-label">Req / min</div><div class="stat-value" id="s-rpm">—</div><div class="stat-sub">last 60s</div></div>
+        <div class="stat-card"><div class="stat-label">Remaining</div><div class="stat-value green" id="s-remaining">—</div><div class="stat-sub">total requests left</div></div>
+        <div class="stat-card"><div class="stat-label">Errors</div><div class="stat-value red" id="s-errors">—</div><div class="stat-sub">upstream failures</div></div>
+        <div class="stat-card"><div class="stat-label">Next Reset</div><div class="stat-value" style="font-size:16px;" id="s-reset">—</div><div class="stat-sub">earliest key reset</div></div>
+        <div class="stat-card"><div class="stat-label">Uptime</div><div class="stat-value" style="font-size:16px;" id="s-uptime">—</div><div class="stat-sub">gateway running</div></div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Key Pool Overview</div>
+        <div id="dashboard-keys-list"><div class="empty">Loading keys…</div></div>
+      </div>
+    </div>
+
+    <!-- ── Keys ──────────────────────────────────────────────── -->
+    <div class="page" id="page-keys">
+      <div>
+        <div class="page-title">API Keys</div>
+        <div class="page-sub">Manage all keys in the rotation pool</div>
+      </div>
+
+      <div class="card" style="padding:14px 20px;">
+        <div class="flex items-center gap-2" style="gap:10px;flex-wrap:wrap;">
+          <span id="keys-count" class="badge accent">0 keys</span>
+          <button class="btn btn-ghost btn-sm" onclick="resetAllKeys()">↺ Reset All</button>
+          <button class="btn btn-primary btn-sm ml-auto" onclick="goto('add')">+ Add Keys</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Label</th>
+                <th>Key</th>
+                <th>Usage</th>
+                <th>Status</th>
+                <th>Last Used</th>
+                <th>Resets In</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="keys-tbody">
+              <tr><td colspan="7" class="empty">No keys added yet.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Add Keys ──────────────────────────────────────────── -->
+    <div class="page" id="page-add">
+      <div>
+        <div class="page-title">Add Keys</div>
+        <div class="page-sub">Add a single key or bulk-import many at once</div>
+      </div>
+
+      <!-- Single -->
+      <div class="card">
+        <div class="card-title">Single Key</div>
+        <div class="form-row">
+          <div class="form-group" style="flex:1;">
+            <label class="form-label">API Key</label>
+            <input class="form-input" id="single-key" placeholder="ShrutiBotsXxxxx…" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Label (optional)</label>
+            <input class="form-input" id="single-label" placeholder="My Key 1" style="min-width:140px;" />
+          </div>
+          <div class="form-group" style="justify-content:flex-end;">
+            <label class="form-label">&nbsp;</label>
+            <button class="btn btn-primary" onclick="addSingleKey()">Add Key</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bulk -->
+      <div class="card">
+        <div class="card-title">Bulk Import</div>
+        <div class="form-group" style="gap:8px;">
+          <label class="form-label">One key per line</label>
+          <textarea class="form-input" id="bulk-keys" placeholder="ShrutiBotsKey1&#10;ShrutiBotsKey2&#10;ShrutiBotsKey3"></textarea>
+          <div class="form-hint">Paste all your keys here — duplicates are auto-skipped.</div>
+          <div style="margin-top:4px;">
+            <button class="btn btn-primary" onclick="bulkAddKeys()">Import All</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Logs ──────────────────────────────────────────────── -->
+    <div class="page" id="page-logs">
+      <div>
+        <div class="flex items-center gap-2" style="gap:10px;">
+          <div class="page-title">Request Logs</div>
+          <span class="live-dot" style="margin-left:auto;"></span>
+        </div>
+        <div class="page-sub">Last 500 proxied requests, newest first</div>
+      </div>
+
+      <div class="card" style="padding:14px 20px;">
+        <div class="flex items-center gap-2" style="gap:10px;flex-wrap:wrap;">
+          <span id="log-count" class="badge accent">0 entries</span>
+          <button class="btn btn-ghost btn-sm" onclick="loadLogs()">↺ Refresh</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="log-row log-header">
+          <span>Time</span><span>Key</span><span>Endpoint</span><span>Status</span><span>Latency</span>
+        </div>
+        <div id="logs-body"><div class="empty">No logs yet.</div></div>
+      </div>
+    </div>
+
+    <!-- ── Integration ───────────────────────────────────────── -->
+    <div class="page" id="page-integration">
+      <div>
+        <div class="page-title">Integration Guide</div>
+        <div class="page-sub">How to point your bot at this gateway</div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">1. Replace API URL in youtube.py</div>
+        <pre style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:12px;overflow-x:auto;line-height:1.7;color:var(--text);">
+<span style="color:var(--muted)"># OLD — direct Shruti API</span>
+PRIMARY_API_URL = <span style="color:var(--green)">"https://api.shrutibots.site"</span>
+
+<span style="color:var(--muted)"># NEW — point to this gateway</span>
+PRIMARY_API_URL = <span style="color:var(--green)">"http://localhost:8000/proxy"</span>
+
+<span style="color:var(--muted)"># Remove the api_key param from your code — gateway injects it automatically</span>
+        </pre>
+      </div>
+
+      <div class="card">
+        <div class="card-title">2. Admin API Reference</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="background:var(--surface2);border-radius:7px;padding:12px 16px;font-size:12px;font-family:monospace;line-height:1.9;">
+            <div><span style="color:var(--green)">GET</span>  <span style="color:var(--accent2)">/admin/stats</span>       — gateway stats</div>
+            <div><span style="color:var(--green)">GET</span>  <span style="color:var(--accent2)">/admin/keys</span>        — list all keys</div>
+            <div><span style="color:var(--yellow)">POST</span> <span style="color:var(--accent2)">/admin/keys</span>        — add single key</div>
+            <div><span style="color:var(--yellow)">POST</span> <span style="color:var(--accent2)">/admin/keys/bulk</span>   — bulk add</div>
+            <div><span style="color:var(--red)">DEL</span>  <span style="color:var(--accent2)">/admin/keys/:id</span>    — delete key</div>
+            <div><span style="color:var(--yellow)">POST</span> <span style="color:var(--accent2)">/admin/keys/:id/reset</span> — reset key count</div>
+            <div><span style="color:var(--yellow)">POST</span> <span style="color:var(--accent2)">/admin/keys/reset-all</span> — reset all</div>
+            <div><span style="color:var(--green)">GET</span>  <span style="color:var(--accent2)">/admin/logs</span>        — request log</div>
+            <div><span style="color:var(--green)">GET</span>  <span style="color:var(--accent2)">/admin/health</span>      — liveness</div>
+            <div><span style="color:var(--green)">ANY</span>  <span style="color:var(--accent2)">/proxy/{path}</span>      — proxied upstream</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">3. Run the Gateway</div>
+        <pre style="background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:12px;overflow-x:auto;line-height:1.7;color:var(--text);">
+pip install fastapi uvicorn aiohttp
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+        </pre>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<div id="toast-wrap"></div>
+
+<script>
+const API = 'http://localhost:8000';
+let currentPage = 'dashboard';
+let refreshTimer = null;
+
+// ── Navigation ───────────────────────────────────────────────────────────────
+function goto(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if (n.getAttribute('onclick')?.includes(page)) n.classList.add('active');
+  });
+  currentPage = page;
+  loadPage(page);
+}
+
+function loadPage(page) {
+  if (page === 'dashboard') { loadStats(); loadDashboardKeys(); }
+  else if (page === 'keys') loadKeys();
+  else if (page === 'logs') loadLogs();
+}
+
+// ── Theme ────────────────────────────────────────────────────────────────────
+let isDark = true;
+function toggleTheme() {
+  isDark = !isDark;
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+  document.getElementById('theme-icon').textContent = isDark ? '☀️' : '🌙';
+  document.getElementById('theme-label').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+}
+
+// ── Toast ────────────────────────────────────────────────────────────────────
+function toast(msg, type = 'ok') {
+  const w = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  w.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function fmtTime(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts * 1000);
+  return d.toLocaleTimeString();
+}
+
+function fmtCountdown(ts) {
+  if (!ts) return '—';
+  const diff = ts - Date.now() / 1000;
+  if (diff <= 0) return 'Now';
+  const h = Math.floor(diff / 3600);
+  const m = Math.floor((diff % 3600) / 60);
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
+}
+
+function fmtUptime(sec) {
+  if (!sec) return '—';
+  const h = Math.floor(sec / 3600);
+  const m = Math.floor((sec % 3600) / 60);
+  const s = sec % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m ${s}s`;
+  return `${s}s`;
+}
+
+function progColor(pct) {
+  if (pct >= 90) return '#f87171';
+  if (pct >= 60) return '#fbbf24';
+  return '#34d399';
+}
+
+function statusColor(pct) {
+  if (pct >= 100) return 'red';
+  if (pct >= 60) return 'yellow';
+  return 'green';
+}
+
+// ── Stats ────────────────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const r = await fetch(`${API}/admin/stats`);
+    const d = await r.json();
+    document.getElementById('s-active').textContent = d.active_keys ?? '—';
+    document.getElementById('s-exhausted').textContent = d.exhausted_keys ?? '—';
+    document.getElementById('s-proxied').textContent = d.total_proxied ?? '—';
+    document.getElementById('s-rpm').textContent = d.requests_last_minute ?? '—';
+    document.getElementById('s-remaining').textContent = d.total_remaining_requests ?? '—';
+    document.getElementById('s-errors').textContent = d.total_errors ?? '—';
+    document.getElementById('s-reset').textContent = fmtCountdown(d.next_reset_at);
+    document.getElementById('s-uptime').textContent = fmtUptime(d.uptime_seconds);
+  } catch (e) {
+    document.getElementById('s-active').textContent = 'ERR';
+  }
+}
+
+async function loadDashboardKeys() {
+  try {
+    const r = await fetch(`${API}/admin/keys`);
+    const d = await r.json();
+    const el = document.getElementById('dashboard-keys-list');
+    if (!d.keys?.length) { el.innerHTML = '<div class="empty">No keys yet. <a href="#" onclick="goto(\'add\')">Add some →</a></div>'; return; }
+    el.innerHTML = d.keys.map(k => {
+      const pct = k.percent_used;
+      const col = progColor(pct);
+      const sc = statusColor(pct);
+      return `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);">
+        <span class="dot ${k.is_active && pct < 100 ? 'green' : pct >= 100 ? 'yellow' : 'red'}"></span>
+        <div style="min-width:100px;font-weight:600;font-size:13px;">${k.label}</div>
+        <div class="prog-wrap" style="flex:1;max-width:200px;">
+          <div class="prog"><div class="prog-fill" style="width:${pct}%;background:${col};"></div></div>
+          <div class="prog-pct">${pct}%</div>
+        </div>
+        <div style="font-size:12px;color:var(--muted);">${k.requests_used}/${k.requests_limit} req</div>
+        <div class="badge ${sc}" style="margin-left:auto;">${pct >= 100 ? 'Exhausted' : k.is_active ? 'Active' : 'Disabled'}</div>
+        <div style="font-size:11px;color:var(--muted);">reset ${fmtCountdown(k.reset_at)}</div>
+      </div>`;
+    }).join('');
+  } catch (e) {}
+}
+
+// ── Keys Page ────────────────────────────────────────────────────────────────
+async function loadKeys() {
+  try {
+    const r = await fetch(`${API}/admin/keys`);
+    const d = await r.json();
+    const tbody = document.getElementById('keys-tbody');
+    document.getElementById('keys-count').textContent = `${d.keys?.length ?? 0} keys`;
+    if (!d.keys?.length) { tbody.innerHTML = '<tr><td colspan="7" class="empty">No keys. <a href="#" onclick="goto(\'add\')">Add some →</a></td></tr>'; return; }
+    tbody.innerHTML = d.keys.map(k => {
+      const pct = k.percent_used;
+      const col = progColor(pct);
+      const sc = statusColor(pct);
+      const status = pct >= 100 ? 'Exhausted' : k.is_active ? 'Active' : 'Disabled';
+      const statusCls = pct >= 100 ? 'yellow' : k.is_active ? 'green' : 'red';
+      return `<tr>
+        <td><span style="font-weight:600;">${k.label}</span></td>
+        <td><span class="key-mono" title="${k.key}">${k.key.slice(0,12)}…</span></td>
+        <td>
+          <div class="prog-wrap">
+            <div class="prog"><div class="prog-fill" style="width:${pct}%;background:${col};"></div></div>
+            <div class="prog-pct">${k.requests_used}/${k.requests_limit}</div>
+          </div>
+        </td>
+        <td><span class="badge ${statusCls}">${status}</span></td>
+        <td style="color:var(--muted);font-size:12px;">${k.last_used ? fmtTime(k.last_used) : '—'}</td>
+        <td style="color:var(--muted);font-size:12px;">${fmtCountdown(k.reset_at)}</td>
+        <td>
+          <div class="flex gap-1" style="gap:6px;">
+            <button class="btn btn-ghost btn-sm btn-icon" title="Reset count" onclick="resetKey('${k.id}')">↺</button>
+            <button class="btn btn-ghost btn-sm btn-icon" title="${k.is_active ? 'Disable' : 'Enable'}" onclick="toggleKey('${k.id}')">${k.is_active ? '⏸' : '▶'}</button>
+            <button class="btn btn-danger btn-sm btn-icon" title="Delete" onclick="deleteKey('${k.id}')">✕</button>
+          </div>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch (e) { toast('Failed to load keys', 'err'); }
+}
+
+async function deleteKey(id) {
+  if (!confirm('Delete this key?')) return;
+  try {
+    await fetch(`${API}/admin/keys/${id}`, { method: 'DELETE' });
+    toast('Key deleted');
+    loadKeys();
+  } catch(e) { toast('Delete failed', 'err'); }
+}
+
+async function toggleKey(id) {
+  try {
+    await fetch(`${API}/admin/keys/${id}/toggle`, { method: 'PATCH' });
+    toast('Key toggled');
+    loadKeys();
+  } catch(e) { toast('Toggle failed', 'err'); }
+}
+
+async function resetKey(id) {
+  try {
+    await fetch(`${API}/admin/keys/${id}/reset`, { method: 'POST' });
+    toast('Key reset');
+    loadKeys();
+  } catch(e) { toast('Reset failed', 'err'); }
+}
+
+async function resetAllKeys() {
+  if (!confirm('Reset ALL key counters?')) return;
+  try {
+    await fetch(`${API}/admin/keys/reset-all`, { method: 'POST' });
+    toast('All keys reset ✓');
+    loadKeys();
+  } catch(e) { toast('Failed', 'err'); }
+}
+
+// ── Add Keys ────────────────────────────────────────────────────────────────
+async function addSingleKey() {
+  const key = document.getElementById('single-key').value.trim();
+  const label = document.getElementById('single-label').value.trim();
+  if (!key) { toast('Enter an API key', 'err'); return; }
+  try {
+    const r = await fetch(`${API}/admin/keys`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ key, label }),
+    });
+    const d = await r.json();
+    if (!r.ok) throw new Error(d.detail || 'Error');
+    toast(`Key added: ${d.key.label}`);
+    document.getElementById('single-key').value = '';
+    document.getElementById('single-label').value = '';
+  } catch(e) { toast(e.message, 'err'); }
+}
+
+async function bulkAddKeys() {
+  const raw = document.getElementById('bulk-keys').value;
+  const keys = raw.split('\n').map(s => s.trim()).filter(Boolean);
+  if (!keys.length) { toast('No keys to import', 'err'); return; }
+  try {
+    const r = await fetch(`${API}/admin/keys/bulk`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ keys }),
+    });
+    const d = await r.json();
+    toast(`Imported ${d.added} keys (${d.skipped.length} skipped)`);
+    document.getElementById('bulk-keys').value = '';
+  } catch(e) { toast('Import failed', 'err'); }
+}
+
+// ── Logs ─────────────────────────────────────────────────────────────────────
+async function loadLogs() {
+  try {
+    const r = await fetch(`${API}/admin/logs?limit=200`);
+    const d = await r.json();
+    const el = document.getElementById('logs-body');
+    document.getElementById('log-count').textContent = `${d.total} entries`;
+    if (!d.logs?.length) { el.innerHTML = '<div class="empty">No requests yet.</div>'; return; }
+    el.innerHTML = d.logs.map(l => {
+      const ok = l.status >= 200 && l.status < 400;
+      return `<div class="log-row">
+        <span class="log-ts">${fmtTime(l.ts)}</span>
+        <span class="log-key">${l.key_id}</span>
+        <span class="log-endpoint">${l.endpoint}</span>
+        <span class="log-status ${ok ? 'ok' : 'err'}">${l.status}</span>
+        <span class="log-latency">${l.latency_ms}ms</span>
+      </div>`;
+    }).join('');
+  } catch(e) {}
+}
+
+// ── Auto refresh ──────────────────────────────────────────────────────────────
+setInterval(() => {
+  if (currentPage === 'dashboard') { loadStats(); loadDashboardKeys(); }
+  if (currentPage === 'logs') loadLogs();
+}, 5000);
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+loadStats();
+loadDashboardKeys();
+</script>
+</body>
+</html>
